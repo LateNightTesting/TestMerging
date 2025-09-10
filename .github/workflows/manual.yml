@@ -1,0 +1,32 @@
+name: Update CODEOWNERS for Release Branch
+
+on:
+  create
+
+jobs:
+  update-codeowners-on-release-branch:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.ref_type == 'branch' && startsWith(github.event.ref, 'release/') }}
+
+    steps:
+      - name: Log Branch Name
+        run: echo "New release branch detected."
+
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.ref }}
+
+      - name: Create Release CODEOWNERS File
+        run: |
+          mkdir -p .github
+          echo "* @mazdaqshahzad" > .github/CODEOWNERS
+        
+      - name: Commit and Push CODEOWNERS
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'CI: Apply release-specific CODEOWNERS'
+          branch: ${{ github.event.ref }}
+          file_pattern: .github/CODEOWNERS
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
